@@ -1,0 +1,28 @@
+--cpu=Cortex-M4.fp
+"can_f407\startup_stm32f407xx.o"
+"can_f407\main.o"
+"can_f407\gpio.o"
+"can_f407\can.o"
+"can_f407\usart.o"
+"can_f407\stm32f4xx_it.o"
+"can_f407\stm32f4xx_hal_msp.o"
+"can_f407\stm32f4xx_hal_can.o"
+"can_f407\stm32f4xx_hal_rcc.o"
+"can_f407\stm32f4xx_hal_rcc_ex.o"
+"can_f407\stm32f4xx_hal_flash.o"
+"can_f407\stm32f4xx_hal_flash_ex.o"
+"can_f407\stm32f4xx_hal_flash_ramfunc.o"
+"can_f407\stm32f4xx_hal_gpio.o"
+"can_f407\stm32f4xx_hal_dma_ex.o"
+"can_f407\stm32f4xx_hal_dma.o"
+"can_f407\stm32f4xx_hal_pwr.o"
+"can_f407\stm32f4xx_hal_pwr_ex.o"
+"can_f407\stm32f4xx_hal_cortex.o"
+"can_f407\stm32f4xx_hal.o"
+"can_f407\stm32f4xx_hal_exti.o"
+"can_f407\stm32f4xx_hal_uart.o"
+"can_f407\system_stm32f4xx.o"
+--library_type=microlib --strict --scatter "can_f407\can_f407.sct"
+--summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
+--info sizes --info totals --info unused --info veneers
+--list "can_f407.map" -o can_f407\can_f407.axf
