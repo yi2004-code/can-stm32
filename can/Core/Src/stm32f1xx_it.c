@@ -21,6 +21,7 @@
 #include "main.h"
 #include "stm32f1xx_it.h"
 #include "can.h"
+#include "adc.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 /* USER CODE END Includes */
@@ -206,5 +207,9 @@ void SysTick_Handler(void)
 void USB_LP_CAN1_RX0_IRQHandler(void){
    HAL_CAN_IRQHandler(&hcan);
 
+}
+
+void DMA1_Channel1_IRQHandler(void){
+HAL_DMA_IRQHandler(&hdma_adc1);
 }
 /* USER CODE END 1 */
