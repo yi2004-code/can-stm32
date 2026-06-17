@@ -45,7 +45,7 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-
+#define ID                    0x001  //给一个名称
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -95,7 +95,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
   /* USER CODE END 2 */
  CAN_Start_Receive();
-  uint8_t test_data[8] = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08};
+ uint8_t test_data[8] = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08};
 printf("启动成功\r\n");
   /* USER CODE END 2 */
 
@@ -104,10 +104,11 @@ printf("启动成功\r\n");
   while (1)
   {
     /* USER CODE END WHILE */
-         CAN_SendData(0x123, test_data, 8);
+         CAN_SendData(ID, test_data, 8);
 	  if(rx_flag==1){
 	      for(int i=0;i<8;i++){
 		     printf("%d\r\n",rx_data[i]);
+			  rx_flag=0;
 		  }
 	  }
         HAL_Delay(1000);

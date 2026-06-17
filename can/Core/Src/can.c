@@ -149,15 +149,15 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan){
  * @brief 配置过滤器、启动CAN并开启FIFO0接收中断
  */
 void CAN_Start_Receive(void) {
-    // 1. 配置过滤器（掩码模式，掩码全0表示接收所有ID，方便调试）
+    // 1. 配置过滤器
     CAN_FilterTypeDef sFilterConfig;
     sFilterConfig.FilterBank = 0;                  // 使用过滤器组0
-    sFilterConfig.FilterMode = CAN_FILTERMODE_IDMASK; // 掩码模式
-    sFilterConfig.FilterScale = CAN_FILTERSCALE_32BIT; // 32位宽度
-    sFilterConfig.FilterIdHigh = 0x0000;           // ID高16位设为0
-    sFilterConfig.FilterIdLow = 0x0000;            // ID低16位设为0
-    sFilterConfig.FilterMaskIdHigh = 0x0000;       // 掩码高16位设为0（全匹配）
-    sFilterConfig.FilterMaskIdLow = 0x0000;        // 掩码低16位设为0（全匹配）
+    sFilterConfig.FilterMode = CAN_FILTERMODE_IDLIST; // 列表模式
+    sFilterConfig.FilterScale = CAN_FILTERSCALE_16BIT; // 16位宽度
+    sFilterConfig.FilterIdHigh = (0x001<<5);           // 
+    sFilterConfig.FilterIdLow = (0x001<<5);            // 
+    sFilterConfig.FilterMaskIdHigh = (0x001<<5);       // 
+    sFilterConfig.FilterMaskIdLow = (0x001<<5);        // 
     sFilterConfig.FilterFIFOAssignment = CAN_RX_FIFO0; // 将收到的数据分配给 FIFO0
     sFilterConfig.FilterActivation = ENABLE;       // 激活该过滤器
     

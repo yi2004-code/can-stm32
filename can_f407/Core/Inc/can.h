@@ -38,7 +38,7 @@ void CAN_Start_Receive(void);
 /* USER CODE END Includes */
 extern CAN_HandleTypeDef hcan1;
 extern uint8_t rx_data[8];
-extern uint8_t rx_flag;
+extern volatile uint8_t rx_flag;
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */

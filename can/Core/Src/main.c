@@ -39,6 +39,7 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 
+#define ID             0x002      //给其一个ID
 
 #define VREF           3.3f      // ADC 参考电压 (V)
 #define ADC_MAX        4095.0f   // 12位 ADC 最大值
@@ -132,8 +133,9 @@ int main(void)
   pid_control fan;
   fan.target=28.00f;
   PID_Init(&fan,25.00f,0.1f,0.0f,1000.00f);
-  //uint8_t test_data[8] = {0x02, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08};
+  uint8_t test_data[2]={0} ;
  printf("启动成功\r\n");
+ static uint32_t last_can_send_time=0;
   /* USER CODE END 2 */
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
@@ -144,13 +146,22 @@ int main(void)
 	  //__HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, 500);
     /* USER CODE END WHILE */
          //CAN_SendData(0x123, test_data, 8);
-//	  if(rx_flag==1){
-//	      for(int i=0;i<8;i++){
-//		     printf("%d\r\n",rx_data[i]);
-//		  }
-//	  }
+	  if(rx_flag==1){
+	      for(int i=0;i<8;i++){
+		     printf("%d\r\n",rx_data[i]);
+			  rx_flag=0;
+		  }
+	  }
 //        HAL_Delay(1000); 
     /* USER CODE BEGIN 3 */
+	  if((HAL_GetTick()-last_can_send_time)>=500){
+	   uint16_t temp=(Temperature*100);//将温度乘100，好将其放到can总线中
+	   test_data[0]=(uint8_t)(temp>>8);
+	   test_data[1]=(uint8_t)(temp&0x00FF);
+	   CAN_SendData(ID,test_data,2);
+	   last_can_send_time=HAL_GetTick();
+	  }
+	  //判断温度是否高于设定值，当高于设定值时，由pid来控制电机pwm
 	  if(Temperature<fan.target){
         __HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2,0);
 		  fan.integral = 0.0f; 
