@@ -1,66 +1,22 @@
-/* USER CODE BEGIN Header */
-/**
-  ******************************************************************************
-  * @file           : main.c
-  * @brief          : Main program body
-  ******************************************************************************
-  * @attention
-  *
-  * Copyright (c) 2026 STMicroelectronics.
-  * All rights reserved.
-  *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
-  *
-  ******************************************************************************
-  */
-/* USER CODE END Header */
-/* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "can.h"
 #include "usart.h"
 #include "gpio.h"
 #include <stdio.h>
-/* Private includes ----------------------------------------------------------*/
-/* USER CODE BEGIN Includes */
 
-/* USER CODE END Includes */
-
-/* Private typedef -----------------------------------------------------------*/
-/* USER CODE BEGIN PTD */
-
-/* USER CODE END PTD */
-
-/* Private define ------------------------------------------------------------*/
-/* USER CODE BEGIN PD */
-
-/* USER CODE END PD */
-
-/* Private macro -------------------------------------------------------------*/
-/* USER CODE BEGIN PM */
-
-/* USER CODE END PM */
-
-/* Private variables ---------------------------------------------------------*/
-
-/* USER CODE BEGIN PV */
 #define ID                    0x001  //给一个名称
-/* USER CODE END PV */
+#define temp_limit            38.00f //定义一个极限温度
+#define wait_time             2000 //定义一个最大等待时间
 
-/* Private function prototypes -----------------------------------------------*/
+static volatile uint8_t count=0;
+static uint8_t warning_data[8]={'W','a','r','n','i','n','g'};
+static uint32_t get_time=0;
 void SystemClock_Config(void);
-/* USER CODE BEGIN PFP */
-
-/* USER CODE END PFP */
-
-/* Private user code ---------------------------------------------------------*/
-/* USER CODE BEGIN 0 */
+void F407_detect(float temp);
 int fputc(int ch,FILE *f){
   HAL_UART_Transmit(&huart1,(uint8_t *)&ch,1,HAL_MAX_DELAY);
   return ch;
 }
-/* USER CODE END 0 */
 
 /**
   * @brief  The application entry point.
@@ -69,55 +25,28 @@ int fputc(int ch,FILE *f){
 int main(void)
 {
 
-  /* USER CODE BEGIN 1 */
-  /* USER CODE END 1 */
-
-  /* MCU Configuration--------------------------------------------------------*/
-
-  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
   HAL_Init();
 
-  /* USER CODE BEGIN Init */
-
-  /* USER CODE END Init */
-
-  /* Configure the system clock */
   SystemClock_Config();
 
-  /* USER CODE BEGIN SysInit */
-
-  /* USER CODE END SysInit */
-
-  /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_CAN1_Init();
   MX_USART1_UART_Init();
-  /* USER CODE BEGIN 2 */
-  /* USER CODE END 2 */
- CAN_Start_Receive();
- uint8_t test_data[8] = {0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08};
-printf("启动成功\r\n");
-  /* USER CODE END 2 */
 
-  /* Infinite loop */
-  /* USER CODE BEGIN WHILE */
+ CAN_Start_Receive();
+printf("启动成功\r\n");
   while (1)
   {
-    /* USER CODE END WHILE */
-         CAN_SendData(ID, test_data, 8);
+	  
 	  if(rx_flag==1){
-	      for(int i=0;i<8;i++){
-		     printf("%d\r\n",rx_data[i]);
-			  rx_flag=0;
-		  }
+		float temp=((rx_data[0]<<8)|rx_data[1])/100.00f;
+		  printf("%0.2f\r\n",temp);
+		  F407_detect(temp);
+          rx_flag=0;
 	  }
-        HAL_Delay(1000);
-    /* USER CODE BEGIN 3 */
   }
-  /* USER CODE END 3 */
 }
 
-  /* USER CODE END 3 */
 
 /**
   * @brief System Clock Configuration
@@ -166,7 +95,18 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-
+void F407_detect(float temp){
+		if(temp>temp_limit){
+		    count++;   //如果温度超额度就计数
+		}else{
+		count=0;   //当温度下降立马清零
+		}
+		if(count>=3){
+		CAN_SendData(ID,warning_data,7);
+			printf("成功发送\r\n");
+			count=0;
+		}
+}
 /* USER CODE END 4 */
 
 /**
